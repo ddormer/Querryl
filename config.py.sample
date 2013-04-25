@@ -1,0 +1,14 @@
+# The IP the web service will bind to
+iface = '127.0.0.1'
+port = 8040
+
+# A path to your SQLite database or a postgreSQL address
+# Default Debian path:
+dbPath = '/var/cache/quassel/quassel-storage.sqlite'
+# Only supports sqlite at the moment
+dbType = 'sqlite'
+
+# Set this to True if you want SSL support
+ssl = True
+sslPrivate = '/etc/ssl/private/querryl.pem'
+sslCert = '/etc/ss/certs/querryl.pem'
