@@ -1,0 +1,21 @@
+li {
+}
+
+#search-results {
+}
+
+#search-indicator {
+    font-size: 15px;
+    font-variant: small-caps;
+}
+
+.block-results {
+}
+
+.highlight {
+    background-color: yellow;
+}
+
+.hidden {
+    display:none;
+}
