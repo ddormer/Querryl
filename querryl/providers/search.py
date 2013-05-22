@@ -1,3 +1,6 @@
+from querryl.error import SearchError
+
+
 class SearchProvider(object):
     """
     A base class for L{querryl.iquerryl.ISearchProvider}.
@@ -43,4 +46,6 @@ class SearchProvider(object):
                 res = list(res)
                 res[6] = self.parseSender(res[6])
                 processed.append(self.dictifyResults(res))
+        else:
+            raise SearchError('No results were found.', 404)
         return processed

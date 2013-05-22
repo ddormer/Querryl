@@ -16,9 +16,9 @@ class PublicHTMLRealm(object):
 
     def anonymous(self):
         root = Resource()
-        root.putChild("", LoginPage(self.avatarId, self.search))
-        root.putChild("login", LoginPage(self.avatarId, self.search))
-        root.putChild("static", static.File('static/'))
+        root.putChild("", LoginPage(self.avatarId))
+        root.putChild("login", LoginPage(self.avatarId))
+        root.putChild("static", static.File('querryl/static/'))
         return root
 
 
@@ -26,9 +26,9 @@ class PublicHTMLRealm(object):
         root = Resource()
         root.putChild("", SearchRoot(self.avatarId, self.search))
         root.putChild("search", Search(self.avatarId, self.search))
-        root.putChild("getBlock", GetBlock(self.avatarId, self.search))
-        root.putChild("login", LoginPage(self.avatarId, self.search))
-        root.putChild("static", static.File('static/'))
+        root.putChild("block", GetBlock(self.avatarId, self.search))
+        root.putChild("login", LoginPage(self.avatarId))
+        root.putChild("static", static.File('querryl/static/'))
         return root
 
 

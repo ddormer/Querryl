@@ -10,6 +10,16 @@ from twisted.python.failure import Failure
 from querryl.utils import FailureEncoder
 
 
+class LoginElement(Element):
+    loader = XMLFile(FilePath('querryl/templates/login.html'))
+
+
+
+class SearchElement(Element):
+    loader = XMLFile(FilePath('querryl/templates/search.html'))
+
+
+
 class _UnauthorizedResource(UnauthorizedResource):
     """
     Simple IResource to escape Resource dispatch
@@ -20,16 +30,11 @@ class _UnauthorizedResource(UnauthorizedResource):
 
 
 
-class LoginElement(Element):
-    loader = XMLFile(FilePath('templates/login.html'))
-
-
-
 class LoginPage(Resource):
     """
     The login page.
     """
-    def __init__(self, avatarId, search):
+    def __init__(self, avatarId):
         self.avatar = avatarId
 
 
@@ -52,10 +57,7 @@ class LoginPage(Resource):
 
 
 
-class Search(Resource):
-    """
-    RESTful resource for using L{querryl.iquerryl.search}.
-    """
+class BaseResource(Resource):
     def __init__(self, avatarId, search):
         self.avatarId = avatarId
         self.search = search
@@ -72,25 +74,43 @@ class Search(Resource):
         request.setHeader('content-type', 'application/json')
 
         if isinstance(d, Failure):
+            request.setResponseCode(500)
+            if hasattr(d.value, 'errorCode'):
+                if d.value.errorCode:
+                    request.setResponseCode(d.value.errorCode)
             request.write(json.dumps(d, cls=FailureEncoder))
         else:
             request.write(json.dumps(d))
         request.finish()
 
 
+    def extractArgs(self, request, arguments):
+        args = []
+        for argument in arguments:
+            arg = request.args.get(argument)
+            if not arg:
+                args.append(None)
+            else:
+                args.append(arg[0])
+        return args
+
+
+
+class Search(BaseResource):
+    """
+    RESTful resource for using L{querryl.iquerryl.search}.
+    """
     def render_GET(self, request):
         accept = request.getHeader('Accept')
-        args = request.args
+
+        arguments = self.extractArgs(request, ('query', 'startTime', 'endTime', 'channel'))
+        arguments.insert(1, self.avatarId)
 
         if 'application/json' in accept:
-            d = self.search.search(
-                    args.get('query', [None])[0],
-                    self.avatarId,
-                    args.get('startTime', [None])[0],
-                    args.get('endTime', [None])[0],
-                    args.get('channel', [None])[0])
+            d = self.search.search(*arguments)
             d.addBoth(self.write_JSON, request)
             return NOT_DONE_YET
+
         if 'text/html' in accept:
             return "Put some parameter information here."
 
@@ -98,17 +118,36 @@ class Search(Resource):
 
 
 
-class GetBlock(Search):
+from querryl.cred.user import IUserStorage
+class GetBlock(BaseResource):
     """
     RESTful resource for using L{querryl.iquerryl.retrieveMessageBlock}.
     """
+    def getBlock(self, request, avatar):
+        arguments = self.extractArgs(request, ('bufferid', 'messageid', 'backlogLimit'))
+        arguments.insert(0, self.avatar.userid)
+
+        d = self.search.retrieveMessageBlock(*arguments)
+        d.addBoth(self.write_JSON, request)
+        return d
+
+
     def render_GET(self, request):
-        return None
+        accept = request.getHeader('Accept')
+        self.avatar = avatar = IUserStorage(request.getSession())
 
+        def cb(userid, avatar):
+            avatar.userid = userid
+            return request
 
+        if 'application/json' in accept:
+            pass
+        d = self.search.getUserId(self.avatarId)
+        d.addCallback(cb, avatar)
+        d.addCallback(self.getBlock, avatar)
+        return NOT_DONE_YET
 
-class SearchElement(Element):
-    loader = XMLFile(FilePath('templates/search.html'))
+        return "Unsupported 'Accept' header"
 
 
 

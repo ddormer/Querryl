@@ -12,3 +12,4 @@ dbType = 'sqlite'
 ssl = True
 sslPrivate = '/etc/ssl/private/querryl.pem'
 sslCert = '/etc/ss/certs/querryl.pem'
+sslPort  = 8041

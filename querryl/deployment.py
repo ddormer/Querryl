@@ -18,6 +18,11 @@ searchServices = {
     }
 
 
+class LongSession(server.Session):
+    sessionTimeout = 172800
+
+
+
 def deploy(iface, port, dbPath, dbType, ssl=False, sslPrivate=None, sslCert=None, sslPort=None):
     searchService = searchServices[dbType](dbPath)
 
@@ -27,6 +32,7 @@ def deploy(iface, port, dbPath, dbType, ssl=False, sslPrivate=None, sslCert=None
 
     application = service.Application("Querryl")
     site = server.Site(BasicWrapper(portal, []))
+    site.sessionFactory = LongSession
 
     if ssl:
         ctx = DefaultOpenSSLContextFactory(sslPrivate, sslCert)

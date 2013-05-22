@@ -87,8 +87,8 @@ class SqliteSearch(SearchProvider):
         """
         Search multiple buffers.
         """
+        print "Warning: searching all buffers, this will probably take a very long time."
         args = [buff[0] for buff in buffers]
-        print args
         query = '''
             SELECT backlog.bufferid, backlog.messageid,
             backlog.type, network.networkname, buffer.buffername,
@@ -101,11 +101,10 @@ class SqliteSearch(SearchProvider):
             AND buffer.bufferid IN (%s)
             AND backlog.type = 1''' % (','.join(['?'] * len(args)))
         args.insert(0, '%'+text+'%')
-        print query
         return self.pool.runQuery(query, args)
 
 
-    def retrieveMessageBlock(self, bufferid, messageid, limit):
+    def retrieveMessageBlock(self, userid, bufferid, messageid, limit):
         """
         Retrieves a number of messages before and after the messageid.
 
@@ -113,15 +112,28 @@ class SqliteSearch(SearchProvider):
 
         @type limit: C{int}
         """
-        def _cb(results):
+        def checkUser(buffers):
+            for buffer in buffers:
+                if int(bufferid) == buffer[0]:
+                    return bufferid
+            raise SearchError("User doesn't have access to buffer")
+
+        def _combine(results):
             return results[0] + results[1]
-        ds = [
-            self._retrievePreviousMessages(bufferid, messageid, limit),
-            self._retrieveFutureMessages(bufferid, messageid, limit)]
-        d = gatherResults(ds, consumeErrors=True)
-        d.addCallback(_cb)
-        d.addCallback(self.processResults)
-        return d
+
+        def getMessages(bufferid):
+            ds = [
+                self._retrievePreviousMessages(bufferid, messageid, limit),
+                self._retrieveFutureMessages(bufferid, messageid, limit)]
+            d2 = gatherResults(ds, consumeErrors=True)
+            d2.addCallback(_combine)
+            d2.addCallback(self.processResults)
+            return d2
+
+        d1 = self.getBuffers(userid)
+        d1.addCallback(checkUser)
+        d1.addCallback(getMessages)
+        return d1
 
 
     def _retrievePreviousMessages(self, bufferid, messageid, limit):
@@ -170,7 +182,7 @@ class SqliteSearch(SearchProvider):
             if buffers:
                 return buffers
             if channel:
-                raise SearchError("Channel %s does not exist." % (channel,))
+                raise SearchError("Channel %s does not exist." % (channel,), 404)
             raise SearchError("User has no buffers.")
 
         d = self.getUserId(username)
