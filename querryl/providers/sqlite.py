@@ -32,6 +32,24 @@ class SqliteSearch(SearchProvider):
         return self.getUser(username=username).addCallback(_getUser)
 
 
+    def getNetworks(self, userid):
+        """
+        Retrieves a list of networks.
+        """
+        # Post-process into dict.
+        def _cb(networks):
+            _networks = []
+            for network in networks:
+                _networks.append({'networkid': network[0], 'networkname': network[1]})
+            return _networks
+
+        d = self.pool.runQuery(
+            u'SELECT networkid, networkname FROM network WHERE userid == ?',
+            (userid,))
+        d.addCallback(_cb)
+        return d
+
+
     def getUser(self, username=None, userid=None):
         """
         Get a user's information.
@@ -51,15 +69,21 @@ class SqliteSearch(SearchProvider):
         return d
 
 
-    def getBuffer(self, userid, channel):
+    def getBuffer(self, userid, channel, networkid):
         return self.pool.runQuery(
-            u'SELECT * FROM buffer WHERE userid = ? AND buffername = ?',
-            (userid, channel))
+                    u"""SELECT * FROM buffer
+                    WHERE userid = ?
+                    AND buffername = ?
+                    AND networkid = ?""", (userid, channel, networkid))
 
 
-    def getBuffers(self, userid):
-        return self.pool.runQuery(
-            u'SELECT * FROM buffer WHERE userid = ?', (userid,))
+    def getBuffers(self, userid, networkid=None):
+        query = u'SELECT * FROM buffer WHERE userid = ?'
+        args = [userid]
+        if networkid:
+            query += u' AND networkid = ?'
+            args.append(networkid)
+        return self.pool.runQuery(query, args)
 
 
     def _searchBuffer(self, buffer, text, startTime, endTime):
@@ -172,7 +196,7 @@ class SqliteSearch(SearchProvider):
         return self.pool.runQuery(q, [bufferid, messageid, limit])
 
 
-    def search(self, query, username, startTime=None, endTime=None, channel=None):
+    def search(self, query, username, startTime=None, endTime=None, channel=None, networkid=None):
         if not query:
             raise SearchError("No query specified.")
         if not username:
@@ -187,11 +211,11 @@ class SqliteSearch(SearchProvider):
 
         d = self.getUserId(username)
         if channel:
-            d.addCallback(self.getBuffer, channel)
+            d.addCallback(self.getBuffer, channel, networkid)
             d.addCallback(checkBuffers, channel)
             d.addCallback(self._searchBuffer, query, startTime, endTime)
         else:
-            d.addCallback(self.getBuffers)
+            d.addCallback(self.getBuffers, networkid)
             d.addCallback(checkBuffers)
             d.addCallback(self._searchBuffers, query, startTime, endTime)
         d.addCallback(self.processResults)

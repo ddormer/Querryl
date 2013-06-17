@@ -62,6 +62,41 @@ class SettingsView extends Backbone.View
         rivets.bind(@el, {settings: @model})
 
 
+class Network extends Backbone.Model
+    idAttribute: 'networkid'
+
+class Networks extends Backbone.Collection
+    url: '/networks'
+    model: Network
+
+class NetworksView extends Backbone.View
+    el: '#network-select'
+
+    initialize: () ->
+        Backbone.View.prototype.initialize.apply(@, arguments)
+        @collection = new Networks
+        @collection.fetch()
+
+        rivets.configure({
+          adapter: {
+            subscribe: (obj, keypath, callback) ->
+                obj.on('sync', callback)
+
+            unsubscribe: (obj, keypath, callback) ->
+                obj.off('sync', callback)
+
+            read: (obj, keypath) ->
+                if obj instanceof Backbone.Collection
+                then obj["models"]
+                else obj.get(keypath)
+
+            publish: (obj, keypath, value) ->
+                obj.set(keypath, value)
+          }
+        })
+        rivets.bind(@el, {networks: @collection})
+
+
 
 class Block extends Backbone.Model
     idAttribute: 'messageid'
@@ -250,6 +285,7 @@ Querryl = {
             searchView: new SearchView
             resultsView: new ResultsView
             settingsView: new SettingsView({model: @Settings})
+            networksView: new NetworksView
         }
 
 
@@ -274,6 +310,7 @@ Querryl = {
         $(form).find('input').each((i, field) ->
             data[field.name] = field.value
         )
+        data['networkid'] = $(form).find(':selected').val()
 
         if not data.channel
             Alertify.dialog.alert("Channel cannot be empty.")

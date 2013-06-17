@@ -4,7 +4,7 @@ from twisted.cred.portal import IRealm
 from twisted.web import static
 from twisted.web.resource import IResource, Resource
 
-from querryl.resources import LoginPage, SearchRoot, GetBlock, Search
+from querryl.resources import LoginPage, SearchRoot, GetBlock, Search, GetNetworks
 
 
 class PublicHTMLRealm(object):
@@ -26,6 +26,7 @@ class PublicHTMLRealm(object):
         root = Resource()
         root.putChild("", SearchRoot(self.avatarId, self.search))
         root.putChild("search", Search(self.avatarId, self.search))
+        root.putChild("networks", GetNetworks(self.avatarId, self.search))
         root.putChild("block", GetBlock(self.avatarId, self.search))
         root.putChild("login", LoginPage(self.avatarId))
         root.putChild("static", static.File('querryl/static/'))

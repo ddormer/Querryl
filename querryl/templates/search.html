@@ -24,6 +24,9 @@
             <form id="search-form" action="" accept-charset="utf-8" onSubmit="return Querryl.handleSubmit(this)">
                 Search: <input id="query" type="text" name="query"></input>
                 Channel: <input type="text" name="channel"></input>
+                Network: <select name="networkid" id="network-select">
+                            <option data-each-network="networks" value="" data-value="network.networkid" data-text="network.networkname"></option>
+                         </select>
                 <input id="search-button" type="submit" value="Search"></input>
             </form>
             <ul id="search-results"></ul>

@@ -98,12 +98,12 @@ class BaseResource(Resource):
 
 class Search(BaseResource):
     """
-    RESTful resource for using L{querryl.iquerryl.search}.
+    RESTful resource for using L{querryl.iquerryl.ISearchProvider.search}.
     """
     def render_GET(self, request):
         accept = request.getHeader('Accept')
 
-        arguments = self.extractArgs(request, ('query', 'startTime', 'endTime', 'channel'))
+        arguments = self.extractArgs(request, ('query', 'startTime', 'endTime', 'channel', 'networkid'))
         arguments.insert(1, self.avatarId)
 
         if 'application/json' in accept:
@@ -121,7 +121,7 @@ class Search(BaseResource):
 from querryl.cred.user import IUserStorage
 class GetBlock(BaseResource):
     """
-    RESTful resource for using L{querryl.iquerryl.retrieveMessageBlock}.
+    RESTful resource for using L{querryl.iquerryl.ISearchProvider.retrieveMessageBlock}.
     """
     def getBlock(self, request, avatar):
         arguments = self.extractArgs(request, ('bufferid', 'messageid', 'backlogLimit'))
@@ -147,8 +147,28 @@ class GetBlock(BaseResource):
         d.addCallback(self.getBlock, avatar)
         return NOT_DONE_YET
 
-        return "Unsupported 'Accept' header"
 
+
+class GetNetworks(BaseResource):
+    """
+    REST Resource for L{querryl.iquerryl.ISearchProvider.getNetworks}.
+    """
+    def getNetworks(self, request, avatar):
+        d = self.search.getNetworks(avatar.userid)
+        d.addBoth(self.write_JSON, request)
+        return d
+
+
+    def render_GET(self, request):
+        self.avatar = avatar = IUserStorage(request.getSession())
+        def cb(userid, avatar):
+            avatar.userid = userid
+            return request
+
+        d = self.search.getUserId(self.avatarId)
+        d.addCallback(cb, avatar)
+        d.addCallback(self.getNetworks, avatar)
+        return NOT_DONE_YET
 
 
 class SearchRoot(Resource):

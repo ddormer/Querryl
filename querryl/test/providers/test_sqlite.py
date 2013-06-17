@@ -77,13 +77,13 @@ class Test_SqliteSearch(TestCase):
 
     def test_getBuffer(self):
         """
-        L{getBuffer} takes a userid and channel, and returns a buffer.
+        L{getBuffer} takes a userid, channel and network then returns a buffer.
         """
         def cb(d):
             self.assertEquals(
                 d, [(1, 1, None, 1, u'#test', u'#test', 2, 71, 0, None, 1)])
 
-        d = self.ss.getBuffer(1, '#test')
+        d = self.ss.getBuffer(1, '#test', networkid=1)
         d.addCallback(cb)
         return d
 
@@ -99,5 +99,19 @@ class Test_SqliteSearch(TestCase):
                     (3, 1, 1, 2, u'#test3', u'#test3', 1, 1, 1, u'1', 1)])
 
         d = self.ss.getBuffers(1)
+        d.addCallback(cb)
+        return d
+
+
+    def test_getBuffersNetwork(self):
+        """
+        L{getBuffers} takes a kwarg named 'networkid' that limits the search to
+        one network.
+        """
+        def cb(d):
+            self.assertEquals(
+                d, [(3, 1, 1, 2, u'#test3', u'#test3', 1, 1, 1, u'1', 1)])
+
+        d = self.ss.getBuffers(1, networkid=2)
         d.addCallback(cb)
         return d
