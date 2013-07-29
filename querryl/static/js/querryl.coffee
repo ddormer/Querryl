@@ -205,8 +205,8 @@ class ResultView extends Backbone.View
         nickColor = Querryl.colourize(@model.get('sender'))
         template = _.template("
         <span><%= Querryl.formatDate(time, Querryl.Settings.get('date'), Querryl.Settings.get('time')) %></span>
-        <%=_.escape(Querryl.Settings.get('leftBracket'))%><span style='color: rgb(#{nickColor});'><%= sender %></span><%=_.escape(Querryl.Settings.get('rightBracket'))%>
-        <span><%= message %></span>")
+        <%=_.escape(Querryl.Settings.get('leftBracket'))%><span style='color: rgb(#{nickColor});'><%= _.escape(sender) %></span><%=_.escape(Querryl.Settings.get('rightBracket'))%>
+        <span><%= _.escape(message) %></span>")
         @$el.append(template(@model.toJSON()))
 
 
