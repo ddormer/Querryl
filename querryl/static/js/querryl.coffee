@@ -123,9 +123,17 @@ class BlockView extends Backbone.View
 
         nickColor = Querryl.colourize(@model.get('sender'))
         template = _.template("
-        <span><%= Querryl.formatDate(time, Querryl.Settings.get('date'), Querryl.Settings.get('time')) %></span>
-        <%=_.escape(Querryl.Settings.get('leftBracket'))%><span style='color: rgb(#{nickColor});'><%= sender %></span><%=_.escape(Querryl.Settings.get('rightBracket'))%>
-        <span><%= message %></span>")
+        <span>
+            <%= Querryl.formatDate(time, Querryl.Settings.get('date'), Querryl.Settings.get('time')) %>
+        </span>
+        <%=_.escape(Querryl.Settings.get('leftBracket'))%>
+        <span style='color: rgb(#{nickColor});'>
+            <%= sender %>
+        </span>
+        <%=_.escape(Querryl.Settings.get('rightBracket'))%>
+        <span>
+            <%= message %>
+        </span>")
         @$el.append(template(@model.toJSON()))
 
 
@@ -205,8 +213,16 @@ class ResultView extends Backbone.View
         nickColor = Querryl.colourize(@model.get('sender'))
         template = _.template("
         <span><%= Querryl.formatDate(time, Querryl.Settings.get('date'), Querryl.Settings.get('time')) %></span>
-        <%=_.escape(Querryl.Settings.get('leftBracket'))%><span style='color: rgb(#{nickColor});'><%= _.escape(sender) %></span><%=_.escape(Querryl.Settings.get('rightBracket'))%>
-        <span><%= _.escape(message) %></span>")
+        <span>
+        <%=_.escape(Querryl.Settings.get('leftBracket'))%>
+        </span>
+        <span style='color: rgb(#{nickColor});'>
+            <%= _.escape(sender) %>
+        </span>
+        <span>
+        <%=_.escape(Querryl.Settings.get('rightBracket'))%>
+        </span>
+        <span onclick=\"Querryl.bold(this);\"><%= _.escape(message) %></span>")
         @$el.append(template(@model.toJSON()))
 
 
@@ -325,7 +341,7 @@ Querryl = {
     colourize: (word) ->
         maxRange = Math.pow(2, 30)
         h = (hashCode(word) % maxRange) / maxRange * 3
-        s = 0.8
+        s = 0.5
         (parseInt(c*255) for c in hsb(h, s))
 
 
@@ -345,6 +361,13 @@ Querryl = {
                 formatString = "HH:mm:ss"
 
         return date.toString(formatString)
+
+
+    bold: (element) ->
+        if $(element).css('font-weight') == '700'
+            $(element).css('font-weight', '400')
+        else
+            $(element).css('font-weight', '700')
 }
 
 $ ->

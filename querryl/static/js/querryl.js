@@ -238,7 +238,7 @@
         this.$el.addClass('highlight');
       }
       nickColor = Querryl.colourize(this.model.get('sender'));
-      template = _.template("        <span><%= Querryl.formatDate(time, Querryl.Settings.get('date'), Querryl.Settings.get('time')) %></span>        <%=_.escape(Querryl.Settings.get('leftBracket'))%><span style='color: rgb(" + nickColor + ");'><%= sender %></span><%=_.escape(Querryl.Settings.get('rightBracket'))%>        <span><%= message %></span>");
+      template = _.template("        <span>            <%= Querryl.formatDate(time, Querryl.Settings.get('date'), Querryl.Settings.get('time')) %>        </span>        <%=_.escape(Querryl.Settings.get('leftBracket'))%>        <span style='color: rgb(" + nickColor + ");'>            <%= sender %>        </span>        <%=_.escape(Querryl.Settings.get('rightBracket'))%>        <span>            <%= message %>        </span>");
       return this.$el.append(template(this.model.toJSON()));
     };
 
@@ -390,7 +390,7 @@
     ResultView.prototype.render = function() {
       var nickColor, template;
       nickColor = Querryl.colourize(this.model.get('sender'));
-      template = _.template("        <span><%= Querryl.formatDate(time, Querryl.Settings.get('date'), Querryl.Settings.get('time')) %></span>        <%=_.escape(Querryl.Settings.get('leftBracket'))%><span style='color: rgb(" + nickColor + ");'><%= _.escape(sender) %></span><%=_.escape(Querryl.Settings.get('rightBracket'))%>        <span><%= _.escape(message) %></span>");
+      template = _.template("        <span><%= Querryl.formatDate(time, Querryl.Settings.get('date'), Querryl.Settings.get('time')) %></span>        <span>        <%=_.escape(Querryl.Settings.get('leftBracket'))%>        </span>        <span style='color: rgb(" + nickColor + ");'>            <%= _.escape(sender) %>        </span>        <span>        <%=_.escape(Querryl.Settings.get('rightBracket'))%>        </span>        <span onclick=\"Querryl.bold(this);\"><%= _.escape(message) %></span>");
       return this.$el.append(template(this.model.toJSON()));
     };
 
@@ -563,7 +563,7 @@
       var c, h, maxRange, s, _i, _len, _ref, _results;
       maxRange = Math.pow(2, 30);
       h = (hashCode(word) % maxRange) / maxRange * 3;
-      s = 0.8;
+      s = 0.3;
       _ref = hsb(h, s);
       _results = [];
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
@@ -589,6 +589,13 @@
         }
       }
       return date.toString(formatString);
+    },
+    bold: function(element) {
+      if ($(element).css('font-weight') === '700') {
+        return $(element).css('font-weight', '400');
+      } else {
+        return $(element).css('font-weight', '700');
+      }
     }
   };
 

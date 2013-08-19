@@ -1,0 +1,23 @@
+#container {
+    margin-top: 55px;
+    padding-top: 10px;
+    background-color: #429AFF;
+    height: 85px;
+}
+
+#login-box {
+    width: 285px;
+    margin: auto;
+}
+
+td {
+    font-variant: small-caps;
+}
+
+.login-button-container {
+    text-align: right;
+}
+
+.login-button-container > input {
+    margin-right: 6px;
+}

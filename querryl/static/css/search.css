@@ -1,4 +1,42 @@
+@font-face {
+    font-family: Inconsolata;
+    src: url('../Inconsolata-Regular.ttf');
+}
+
+
+body {
+    font-family: "Consolas", Inconsolata;
+}
+
+
 li {
+    white-space: nowrap;
+}
+
+#settings > h3 {
+    text-decoration: underline;
+}
+
+#settings > div {
+    width: 300px;
+    text-align: left;
+    margin-top: 10px;
+    height: 20px;
+    font-size: 20px;
+}
+
+#settings > div > input {
+    float: right;
+    width: 25px;
+    height: 20px;
+}
+
+#menu {
+    float: right;
+}
+
+#search-form {
+    font-size: 18px;
 }
 
 #search-results {
@@ -10,12 +48,5 @@ li {
 }
 
 .block-results {
-}
-
-.highlight {
-    background-color: yellow;
-}
-
-.hidden {
-    display:none;
+    margin-bottom: 25px;
 }

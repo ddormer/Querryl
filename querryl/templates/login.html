@@ -7,11 +7,22 @@
         <script src="../static/js/login.js"></script>
     </head>
     <body>
-        <form name="login" action="/login" method="post" accept-charset="utf-8">
-            <input id="username" type="text" name="username" />
-            Password:
-            <input type="password" name="password" />
-            <input class="button" type="submit" value="Login" name="login" />
-        </form>
+        <div id="login-box">
+            <form name="login" action="/login" method="post" accept-charset="utf-8">
+                <table border="0">
+                    <tr>
+                        <td>username:</td>
+                        <td> <input id="username" type="text" name="username" /> </td>
+                    </tr>
+                    <tr>
+                        <td>password:</td>
+                        <td><input type="password" name="password" /></td>
+                    </tr>
+                </table>
+                <div class="login-button-container">
+                    <input class="button" type="submit" value="Login" name="login"/>
+                </div>
+            </form>
+        </div>
     </body>
 </html>
