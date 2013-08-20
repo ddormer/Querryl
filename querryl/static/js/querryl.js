@@ -3,7 +3,15 @@
   var Block, BlockView, Blocks, BlocksView, Network, Networks, NetworksView, Querryl, Result, ResultView, Results, ResultsView, SearchView, Settings, SettingsView, hashCode, hsb, wave,
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
-    _this = this;
+    _this = this,
+    __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
+
+  rivets.formatters.testing = function(value) {
+    if (value === Querryl.Settings.get('theme')) {
+      return true;
+    }
+    return false;
+  };
 
   Settings = (function(_super) {
 
@@ -16,52 +24,68 @@
     Settings.prototype.initialize = function() {
       Backbone.Model.prototype.initialize.apply(this, arguments);
       this.fetch();
-      return this.bind('change', this.save);
+      this.bind('change', this.save);
+      return this.bind('change:theme', this.themeChanged);
     };
 
     Settings.prototype.defaults = {
-      seperator: '|',
       leftBracket: '<',
       rightBracket: '>',
       backlogLimit: 5,
       date: false,
-      time: true
+      time: true,
+      themes: [
+        {
+          name: 'solarized-dark'
+        }, {
+          name: 'solarized-light'
+        }
+      ],
+      theme: 'solarized-dark'
+    };
+
+    Settings.prototype.themeChanged = function(obj, value) {
+      return Querryl.setTheme(value);
     };
 
     Settings.prototype.getItem = function(key) {
-      return localStorage.getItem(key);
+      return JSON.parse(localStorage.getItem(key));
     };
 
     Settings.prototype.sync = function(method, model, options) {
-      var attr, item, _i, _j, _len, _len1, _ref, _ref1, _results;
+      var attr, item, key, keys, _i, _j, _len, _len1, _results;
       if (options == null) {
         options = {};
       }
+      keys = (function() {
+        var _results;
+        _results = [];
+        for (key in this.defaults) {
+          _results.push(key);
+        }
+        return _results;
+      }).call(this);
       _.defaults(options, {
-        'seperator': this.get('seperator'),
         'leftBracket': this.get('leftBracket'),
         'rightBracket': this.get('rightBracket'),
         'backlogLimit': this.get('backlogLimit'),
         'date': this.get('date'),
-        'time': this.get('time')
+        'time': this.get('time'),
+        'themes': this.get('themes'),
+        'theme': this.get('theme')
       });
       if (method === 'read') {
-        _ref = ['seperator', 'leftBracket', 'rightBracket', 'backlogLimit', 'date', 'time'];
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          attr = _ref[_i];
+        for (_i = 0, _len = keys.length; _i < _len; _i++) {
+          attr = keys[_i];
           item = this.getItem(attr);
-          if (attr === 'date' || attr === 'time') {
-            item = JSON.parse(item);
-          }
           this.set(attr, item != null ? item : options[attr]);
         }
       }
       if (method === 'update' || method === 'create') {
-        _ref1 = ['seperator', 'leftBracket', 'rightBracket', 'backlogLimit', 'date', 'time'];
         _results = [];
-        for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
-          attr = _ref1[_j];
-          _results.push(localStorage.setItem(attr, options[attr]));
+        for (_j = 0, _len1 = keys.length; _j < _len1; _j++) {
+          attr = keys[_j];
+          _results.push(localStorage.setItem(attr, JSON.stringify(options[attr])));
         }
         return _results;
       }
@@ -563,7 +587,7 @@
       var c, h, maxRange, s, _i, _len, _ref, _results;
       maxRange = Math.pow(2, 30);
       h = (hashCode(word) % maxRange) / maxRange * 3;
-      s = 0.3;
+      s = 0.5;
       _ref = hsb(h, s);
       _results = [];
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
@@ -596,6 +620,24 @@
       } else {
         return $(element).css('font-weight', '700');
       }
+    },
+    setTheme: function(theme) {
+      var item, themes;
+      themes = (function() {
+        var _i, _len, _ref, _results;
+        _ref = this.Settings.get('themes');
+        _results = [];
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          item = _ref[_i];
+          _results.push(item.name);
+        }
+        return _results;
+      }).call(this);
+      if (__indexOf.call(themes, theme) < 0) {
+        return;
+      }
+      this.Settings.set('theme', theme);
+      return $('#theme').attr('href', "../static/css/themes/" + theme + ".css");
     }
   };
 
@@ -605,6 +647,7 @@
     Querryl.initialize();
     new Querryl.Router;
     Backbone.history.start();
+    Querryl.setTheme(Querryl.Settings.get('theme'));
     return window.Querryl = Querryl;
   });
 

@@ -3,11 +3,9 @@
     src: url('../Inconsolata-Regular.ttf');
 }
 
-
 body {
     font-family: "Consolas", Inconsolata;
 }
-
 
 li {
     white-space: nowrap;
@@ -28,6 +26,11 @@ li {
 #settings > div > input {
     float: right;
     width: 25px;
+    height: 20px;
+}
+
+#settings > div > select {
+    float: right;
     height: 20px;
 }
 

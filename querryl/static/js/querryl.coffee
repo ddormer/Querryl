@@ -1,41 +1,55 @@
+rivets.formatters.testing = (value) ->
+    if value == Querryl.Settings.get('theme')
+        return true
+    return false
+
 class Settings extends Backbone.Model
     initialize: ->
         Backbone.Model.prototype.initialize.apply(@, arguments)
         @fetch()
         @bind('change', @save)
+        @bind('change:theme', @themeChanged)
 
     defaults: {
-        seperator: '|'
         leftBracket: '<'
         rightBracket: '>'
         backlogLimit: 5
         date: false
         time: true
+        themes: [{name: 'solarized-dark'}, {name:'solarized-light'}]
+        theme: 'solarized-dark'
     }
 
+    themeChanged: (obj, value) ->
+        Querryl.setTheme(value)
+
     getItem: (key) ->
-        return localStorage.getItem(key)
+        return JSON.parse(localStorage.getItem(key))
 
     sync: (method, model, options = {}) ->
+        keys = (key for key of @defaults)
+
+        # An unfortunate mess
         _.defaults(options, {
-            'seperator': @get('seperator')
             'leftBracket': @get('leftBracket')
             'rightBracket': @get('rightBracket')
             'backlogLimit': @get('backlogLimit')
             'date': @get('date')
             'time': @get('time')
+            'themes': @get('themes')
+            'theme': @get('theme')
         })
 
         if method is 'read'
-            for attr in ['seperator', 'leftBracket', 'rightBracket', 'backlogLimit', 'date', 'time']
+            # Loop over the settings.
+            for attr in keys
+                # Retrieve the value stored in local storage.
                 item = @getItem(attr)
-                if attr in ['date', 'time']
-                    item = JSON.parse(item)
                 @set(attr, item ? options[attr])
 
         if method in ['update', 'create']
-            for attr in ['seperator', 'leftBracket', 'rightBracket', 'backlogLimit', 'date', 'time']
-                localStorage.setItem(attr, options[attr])
+            for attr in keys
+                localStorage.setItem(attr, JSON.stringify(options[attr]))
 
 
 
@@ -368,6 +382,14 @@ Querryl = {
             $(element).css('font-weight', '400')
         else
             $(element).css('font-weight', '700')
+
+
+    setTheme: (theme) ->
+        themes = (item.name for item in @Settings.get('themes'))
+        if theme not in themes
+            return
+        @Settings.set('theme', theme)
+        $('#theme').attr('href', "../static/css/themes/#{theme}.css")
 }
 
 $ ->
@@ -376,6 +398,5 @@ $ ->
     Querryl.initialize()
     new Querryl.Router
     Backbone.history.start()
+    Querryl.setTheme(Querryl.Settings.get('theme'))
     window.Querryl = Querryl
-
-

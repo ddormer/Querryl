@@ -3,8 +3,8 @@
         <title>Querryl</title>
         <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 
-        <link rel="stylesheet" href="../static/css/search.css" type="text/css" />
-        <link rel="stylesheet" href="../static/css/search-dark.css" type="text/css" />
+        <link rel="stylesheet" href="../static/css/search-base.css" type="text/css" />
+        <link id="theme" rel="stylesheet" href="" type="text/css" />
         <link rel="stylesheet" href="../static/css/alertify.css" />
         <link rel="stylesheet" href="../static/css/alertify.default.css" id="toggleCSS" />
         <script src="../static/js/jquery-1.9.1.min.js"></script>
@@ -44,9 +44,6 @@
                 Time: <input type='checkbox' name='time' data-checked='settings.time'></input>
             </div>
             <div>
-                Seperator: <input type='input' name='seperator' data-value='settings.seperator'></input>
-            </div>
-            <div>
                 Nick Prefix: <input type='input' name='leftBracket' data-value='settings.leftBracket'></input>
             </div>
             <div>
@@ -54,6 +51,12 @@
             </div>
             <div>
                 Backlog: <input type='input' name='backlog' data-value='settings.backlogLimit'></input>
+            </div>
+            <div>
+                Theme:
+                <select name="themes" data-value='settings.theme'>
+                    <option data-each-theme="settings.themes" data-value='theme:name' data-text='theme:name' data-selected="theme:name | testing"></option>
+                </select>
             </div>
         </div>
     </body>

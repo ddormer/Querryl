@@ -1,0 +1,41 @@
+// Solarized colour scheme
+
+@font-face {
+    font-family: Inconsolata;
+    src: url('../Inconsolata-Regular.ttf');
+}
+
+body {
+    font-family: "Consolas", Inconsolata;
+    background-color: #002b36;
+    color: #93a1a1;
+}
+
+
+li {
+    color: #839496;
+}
+
+a {
+    color: #b58900;
+}
+
+#menu > a {
+    margin-right: 50px;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 25px;
+    color: #cb4b16;
+}
+
+#settings > div {
+    background-color: #073642;
+}
+
+.block-results {
+    color: #586e75;
+}
+
+.highlight {
+    background-color: #073642;
+}
