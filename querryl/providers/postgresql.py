@@ -1,18 +1,25 @@
 from zope.interface import implements
 
 from twisted.internet.defer import gatherResults
-from twisted.enterprise import adbapi
+
+from txpostgres.txpostgres import ConnectionPool
 
 from querryl.iquerryl import ISearchProvider
 from querryl.error import SearchError
 from querryl.providers.search import SearchProvider
 
 
-class SqliteSearch(SearchProvider):
+class PostgresqlSearch(SearchProvider):
     implements(ISearchProvider)
 
-    def __init__(self, path):
-        self.pool = adbapi.ConnectionPool("sqlite3", path)
+    def __init__(self, address, username, password):
+        port = 5432
+        host = address
+        if ':' in address:
+            host, port = address.split(':')
+        self.pool = ConnectionPool("postgresql", database="quassel",
+                                   user=username, password=password, host=host)
+        self.pool.start()
 
 
     def getUsername(self, userid):
@@ -35,13 +42,14 @@ class SqliteSearch(SearchProvider):
         """
         # Post-process into dict.
         def _cb(networks):
+            print networks
             _networks = []
             for network in networks:
                 _networks.append({'networkid': network[0], 'networkname': network[1]})
             return _networks
 
         d = self.pool.runQuery(
-            u'SELECT networkid, networkname FROM network WHERE userid == ?',
+            u'SELECT networkid, networkname FROM network WHERE userid = %s',
             (userid,))
         d.addCallback(_cb)
         return d
@@ -59,26 +67,26 @@ class SqliteSearch(SearchProvider):
         """
         if username:
             d = self.pool.runQuery(
-                u'SELECT * from quasseluser WHERE username == ?', (username,))
+                u'SELECT * from quasseluser WHERE username = %s', (username,))
         if userid:
             d = self.pool.runQuery(
-                u'SELECT * from quasseluser WHERE userid == ?', (userid,))
+                u'SELECT * from quasseluser WHERE userid = %s', (userid,))
         return d
 
 
     def getBuffer(self, userid, channel, networkid):
         return self.pool.runQuery(
                     u"""SELECT * FROM buffer
-                    WHERE userid = ?
-                    AND buffername = ?
-                    AND networkid = ?""", (userid, channel, networkid))
+                    WHERE userid = %s
+                    AND buffername = %s
+                    AND networkid = %s""", (userid, channel, networkid))
 
 
     def getBuffers(self, userid, networkid=None):
-        query = u'SELECT * FROM buffer WHERE userid = ?'
+        query = u'SELECT * FROM buffer WHERE userid = %s'
         args = [userid]
         if networkid:
-            query += u' AND networkid = ?'
+            query += u' AND networkid = %s'
             args.append(networkid)
         return self.pool.runQuery(query, args)
 
@@ -90,13 +98,13 @@ class SqliteSearch(SearchProvider):
         query = '''
             SELECT backlog.bufferid, backlog.messageid, backlog.type,
             network.networkname, buffer.buffername,
-            backlog.time, sender.sender, backlog.message
+            EXTRACT(epoch FROM backlog.time), sender.sender, backlog.message
             FROM backlog
             JOIN sender ON backlog.senderid = sender.senderid
             JOIN buffer ON backlog.bufferid = buffer.bufferid
             JOIN network ON buffer.networkid = network.networkid
-            WHERE backlog.message LIKE ? AND buffer.bufferid = ?
-            AND backlog.type = 1 AND backlog.time BETWEEN ? AND ?'''
+            WHERE backlog.message LIKE %s AND buffer.bufferid = %s
+            AND backlog.type = 1 AND EXTRACT(epoch FROM backlog.time) BETWEEN %s AND %s'''
         args = ['%'+text+'%',
                 buffer[0][0],
                 startTime or 0,
@@ -113,14 +121,14 @@ class SqliteSearch(SearchProvider):
         query = '''
             SELECT backlog.bufferid, backlog.messageid,
             backlog.type, network.networkname, buffer.buffername,
-            backlog.time, sender.sender, backlog.message
+            EXTRACT(epoch FROM backlog.time), sender.sender, backlog.message
             FROM backlog
             JOIN sender ON backlog.senderid = sender.senderid
             JOIN buffer ON backlog.bufferid = buffer.bufferid
             JOIN network ON buffer.networkid = network.networkid
-            WHERE backlog.message LIKE ?
+            WHERE backlog.message LIKE %s
             AND buffer.bufferid IN (%s)
-            AND backlog.type = 1''' % (','.join(['?'] * len(args)))
+            AND backlog.type = 1''' % (','.join(['%s'] * len(args)))
         args.insert(0, '%'+text+'%')
         return self.pool.runQuery(query, args)
 
@@ -165,14 +173,14 @@ class SqliteSearch(SearchProvider):
         q = '''
             SELECT backlog.bufferid, backlog.messageid,
             backlog.type, network.networkname, buffer.buffername,
-            backlog.time, sender.sender, backlog.message
+            EXTRACT(epoch FROM backlog.time), sender.sender, backlog.message
             FROM backlog
             JOIN sender ON backlog.senderid = sender.senderid
             JOIN buffer ON backlog.bufferid = buffer.bufferid
             JOIN network ON buffer.networkid = network.networkid
-            WHERE buffer.bufferid = ?
+            WHERE buffer.bufferid = %s
             AND backlog.type = 1
-            AND backlog.messageid <= ? ORDER BY backlog.messageid DESC LIMIT ?'''
+            AND backlog.messageid <= %s ORDER BY backlog.messageid DESC LIMIT %s'''
         d = self.pool.runQuery(q, [bufferid, messageid, limit])
         d.addCallback(_reverse)
         return d
@@ -182,12 +190,12 @@ class SqliteSearch(SearchProvider):
         q = '''
             SELECT backlog.bufferid, backlog.messageid,
             backlog.type, network.networkname, buffer.buffername,
-            backlog.time, sender.sender, backlog.message
+            EXTRACT(epoch FROM backlog.time), sender.sender, backlog.message
             FROM backlog
             JOIN sender ON backlog.senderid = sender.senderid
             JOIN buffer ON backlog.bufferid = buffer.bufferid
             JOIN network ON buffer.networkid = network.networkid
-            WHERE buffer.bufferid = ?
+            WHERE buffer.bufferid = %s
             AND backlog.type = 1
-            AND backlog.messageid > ? LIMIT ?'''
+            AND backlog.messageid > %s LIMIT %s'''
         return self.pool.runQuery(q, [bufferid, messageid, limit])

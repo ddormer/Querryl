@@ -2,11 +2,19 @@
 iface = '127.0.0.1'
 port = 8040
 
+
+# NB: It's recommended to only use PostgreSQL as sqlite Quassel will crash if
+# the sqlite database is in use while trying to access it.
+
 # A path to your SQLite database or a postgreSQL address
 # Default Debian path:
-dbPath = '/var/cache/quassel/quassel-storage.sqlite'
-# Only supports sqlite at the moment
-dbType = 'sqlite'
+#dbLocation = '/var/cache/quassel/quassel-storage.sqlite'
+dbLocation = 'localhost:5432'
+# Options are 'sqlite' and 'postgresql'
+dbType = 'postgresql'
+# PostgreSQL username and password.
+dbUsername = 'querryl'
+dbPassword = 'password'
 
 # Set this to True if you want SSL support
 ssl = True

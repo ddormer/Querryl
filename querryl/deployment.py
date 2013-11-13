@@ -11,11 +11,13 @@ from querryl.cred.credentials import (
 from querryl.cred.realm import PublicHTMLRealm
 from querryl.cred.wrapper import BasicWrapper
 from querryl.providers.sqlite import SqliteSearch
+from querryl.providers.postgresql import PostgresqlSearch
 from querryl.utils import RedirectFromRequest
 
 
 searchServices = {
-    'sqlite': SqliteSearch
+    'sqlite': SqliteSearch,
+    'postgresql': PostgresqlSearch
     }
 
 
@@ -24,8 +26,13 @@ class LongSession(server.Session):
 
 
 
-def deploy(iface, port, dbPath, dbType, ssl=False, sslRedirect=False, sslPrivate=None, sslCert=None, sslPort=None):
-    searchService = searchServices[dbType](dbPath)
+def deploy(iface, port, dbLocation, dbType, dbUsername=None, dbPassword=None,
+           ssl=False, sslRedirect=False, sslPrivate=None, sslCert=None, sslPort=None):
+
+    if dbUsername and dbPassword:
+        searchService = searchServices[dbType](dbLocation, dbUsername, dbPassword)
+    else:
+        searchService = searchServices[dbType](dbLocation)
 
     portal = Portal(PublicHTMLRealm(searchService), [AllowAnonymousAccess()])
     portal.registerChecker(QuasselChecker(searchService), IUsernameHashedPassword)
