@@ -10,6 +10,9 @@ dbType = 'sqlite'
 
 # Set this to True if you want SSL support
 ssl = True
+# Redirects from port to sslPort.
+sslRedirect = True
+# The file location of the ssl certificate and private key.
 sslPrivate = '/etc/ssl/private/querryl.pem'
-sslCert = '/etc/ss/certs/querryl.pem'
+sslCert = '/etc/ssl/certs/querryl.pem'
 sslPort  = 8041

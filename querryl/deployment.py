@@ -11,6 +11,7 @@ from querryl.cred.credentials import (
 from querryl.cred.realm import PublicHTMLRealm
 from querryl.cred.wrapper import BasicWrapper
 from querryl.providers.sqlite import SqliteSearch
+from querryl.utils import RedirectFromRequest
 
 
 searchServices = {
@@ -23,7 +24,7 @@ class LongSession(server.Session):
 
 
 
-def deploy(iface, port, dbPath, dbType, ssl=False, sslPrivate=None, sslCert=None, sslPort=None):
+def deploy(iface, port, dbPath, dbType, ssl=False, sslRedirect=False, sslPrivate=None, sslCert=None, sslPort=None):
     searchService = searchServices[dbType](dbPath)
 
     portal = Portal(PublicHTMLRealm(searchService), [AllowAnonymousAccess()])
@@ -38,6 +39,9 @@ def deploy(iface, port, dbPath, dbType, ssl=False, sslPrivate=None, sslCert=None
         ctx = DefaultOpenSSLContextFactory(sslPrivate, sslCert)
         ssl_sv = internet.SSLServer(sslPort, site, ctx, interface=iface)
         ssl_sv.setServiceParent(application)
+
+        if sslRedirect:
+            site = server.Site(RedirectFromRequest(port=sslPort))
 
     sv = internet.TCPServer(port, site, interface=iface)
     sv.setServiceParent(application)
