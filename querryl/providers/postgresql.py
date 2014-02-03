@@ -139,6 +139,7 @@ class PostgresqlSearch(SearchProvider):
 
         @type messageid: C{int}
 
+        @param limit: The amount of lines to retrieve.
         @type limit: C{int}
         """
         def checkUser(buffers):
@@ -197,5 +198,5 @@ class PostgresqlSearch(SearchProvider):
             JOIN network ON buffer.networkid = network.networkid
             WHERE buffer.bufferid = %s
             AND backlog.type = 1
-            AND backlog.messageid > %s LIMIT %s'''
+            AND backlog.messageid > %s ORDER BY backlog.messageid ASC LIMIT %s'''
         return self.pool.runQuery(q, [bufferid, messageid, limit])
