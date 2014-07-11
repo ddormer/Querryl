@@ -2,11 +2,24 @@ from zope.interface import implements
 
 from twisted.internet.defer import gatherResults
 
-from txpostgres.txpostgres import ConnectionPool
+from txpostgres.txpostgres import ConnectionPool, Connection
+from txpostgres.reconnection import DeadConnectionDetector
 
 from querryl.iquerryl import ISearchProvider
 from querryl.error import SearchError
 from querryl.providers.search import SearchProvider
+
+
+
+class ReconnectingConnection(Connection):
+    def __init__(self, reactor=None, cooperator=None, detector=DeadConnectionDetector):
+        Connection.__init__(self, reactor=reactor, cooperator=cooperator, detector=detector())
+
+
+
+class ReconnectingPool(ConnectionPool):
+    connectionFactory = ReconnectingConnection
+
 
 
 class PostgresqlSearch(SearchProvider):
@@ -17,8 +30,12 @@ class PostgresqlSearch(SearchProvider):
         host = address
         if ':' in address:
             host, port = address.split(':')
-        self.pool = ConnectionPool("postgresql", database="quassel",
-                                   user=username, password=password, host=host)
+        self.pool = ReconnectingPool(
+            "postgresql",
+            database="quassel",
+            user=username,
+            password=password,
+            host=host)
         self.pool.start()
 
 
