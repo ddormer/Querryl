@@ -1,12 +1,3 @@
-@font-face {
-    font-family: Inconsolata;
-    src: url('../Inconsolata-Regular.ttf');
-}
-
-body {
-    font-family: "Consolas", Inconsolata;
-}
-
 li {
     white-space: nowrap;
 }
@@ -34,15 +25,23 @@ li {
     height: 20px;
 }
 
-#menu {
-    float: right;
+#search {
+    float: left;
+    text-decoration: none;
+    font-size: 20px;
+    height: 20px;
+    width: 100%;
 }
 
-#search-form {
-    font-size: 18px;
+#menu {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 25px;
 }
 
 #search-results {
+    float:left;
 }
 
 #search-indicator {
@@ -52,4 +51,41 @@ li {
 
 .block-results {
     margin-bottom: 25px;
+}
+
+
+#top-bar {
+    top: 0px;
+    height: 5em;
+    width: 100%;
+}
+
+#search-form {
+    font-size: 1.2em;
+
+    float: left;
+    width: 300px;
+    transform: translateY(1.2em);
+    -webkit-transform: translateY(1.2em);
+}
+
+#search-form > input, #search-form > select{
+    font-size: 0.8em;
+
+    margin-right: 2em;
+    margin-left: 0.5em;
+}
+
+
+@media all and (min-width: 1100px) {
+    #search-form {
+        width: 100%;
+    }
+}
+
+@media all and (min-width: 1200px) {
+    #search-form {
+        width: 90%;
+        margin-left: 10%;
+    }
 }

@@ -36,12 +36,14 @@
       time: true,
       themes: [
         {
+          name: 'default'
+        }, {
           name: 'solarized-dark'
         }, {
           name: 'solarized-light'
         }
       ],
-      theme: 'solarized-dark'
+      theme: 'default'
     };
 
     Settings.prototype.themeChanged = function(obj, value) {
@@ -430,7 +432,7 @@
       return SearchView.__super__.constructor.apply(this, arguments);
     }
 
-    SearchView.prototype.el = '#search';
+    SearchView.prototype.el = '#search-container';
 
     return SearchView;
 

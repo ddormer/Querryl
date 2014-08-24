@@ -16,8 +16,8 @@ class Settings extends Backbone.Model
         backlogLimit: 5
         date: false
         time: true
-        themes: [{name: 'solarized-dark'}, {name:'solarized-light'}]
-        theme: 'solarized-dark'
+        themes: [{name: 'default'}, {name: 'solarized-dark'}, {name:'solarized-light'}]
+        theme: 'default'
     }
 
     themeChanged: (obj, value) ->
@@ -242,7 +242,7 @@ class ResultView extends Backbone.View
 
 
 class SearchView extends Backbone.View
-    el: '#search'
+    el: '#search-container'
 
 
 

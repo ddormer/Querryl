@@ -7,7 +7,7 @@
 
 body {
     font-family: "Consolas", Inconsolata;
-    background-color: #002b36;
+    background-color: #073642;
     color: #93a1a1;
 }
 
@@ -21,11 +21,17 @@ a {
 }
 
 #menu > a {
-    margin-right: 50px;
     text-decoration: none;
     font-weight: 500;
-    font-size: 25px;
     color: #cb4b16;
+}
+
+.form-input-container {
+    background-color: #002b36;
+    border: 1px #003D4D solid;
+}
+
+input, select {
 }
 
 #settings > div {

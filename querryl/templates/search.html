@@ -7,6 +7,7 @@
         <link id="theme" rel="stylesheet" href="" type="text/css" />
         <link rel="stylesheet" href="../static/css/alertify.css" />
         <link rel="stylesheet" href="../static/css/alertify.default.css" id="toggleCSS" />
+
         <script src="../static/js/jquery-1.9.1.min.js"></script>
         <script src="../static/js/xdate.js"></script>
         <script src="../static/js/underscore-min.js"></script>
@@ -16,23 +17,33 @@
         <script src="../static/js/querryl.js"></script>
     </head>
     <body>
+        <div id="top-bar">
+            <form id="search-form"
+                  action=""
+                  accept-charset="utf-8"
+                  autocomplete="off"
+                  onSubmit="return Querryl.handleSubmit(this)">
+                    Search: <input id="query" type="text" name="query" placeholder="bananas"></input>
+                    Channel: <input type="text" name="channel" placeholder="#food"></input>
+                    Network: <select name="networkid" id="network-select">
+                    <option value=""
+                            data-each-network="networks"
+                            data-value="network.networkid"
+                            data-text="network.networkname">
+                    </option>
+                    </select>
+                    <input id="search-button" type="submit" value="Search"></input>
+            </form>
+        </div>
         <div id="menu">
             <a href="#/search">Search</a>
             <a href="#/settings">Settings</a>
         </div>
 
-        <div id="search">
-            <form id="search-form" action="" accept-charset="utf-8" onSubmit="return Querryl.handleSubmit(this)">
-                Search: <input id="query" type="text" name="query"></input> |
-                Channel: <input type="text" name="channel"></input> |
-                Network: <select name="networkid" id="network-select">
-                            <option data-each-network="networks" value="" data-value="network.networkid" data-text="network.networkname"></option>
-                         </select>
-                <input id="search-button" type="submit" value="Search"></input>
-            </form>
-            <hr />
+        <div id="search-container">
             <ul id="search-results"></ul>
         </div>
+
         <div id="settings">
             <h3>
                 Settings
