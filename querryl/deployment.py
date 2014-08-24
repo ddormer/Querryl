@@ -17,8 +17,7 @@ from querryl.utils import RedirectFromRequest
 
 searchServices = {
     'sqlite': SqliteSearch,
-    'postgresql': PostgresqlSearch
-    }
+    'postgresql': PostgresqlSearch}
 
 
 class LongSession(server.Session):
@@ -27,10 +26,12 @@ class LongSession(server.Session):
 
 
 def deploy(iface, port, dbLocation, dbType, dbUsername=None, dbPassword=None,
-           ssl=False, sslRedirect=False, sslPrivate=None, sslCert=None, sslPort=None):
+           ssl=False, sslRedirect=False, sslPrivate=None, sslCert=None,
+           sslPort=None):
 
     if dbUsername and dbPassword:
-        searchService = searchServices[dbType](dbLocation, dbUsername, dbPassword)
+        searchService = searchServices[dbType](
+            dbLocation, dbUsername, dbPassword)
     else:
         searchService = searchServices[dbType](dbLocation)
 
@@ -52,4 +53,4 @@ def deploy(iface, port, dbLocation, dbType, dbUsername=None, dbPassword=None,
 
     sv = internet.TCPServer(port, site, interface=iface)
     sv.setServiceParent(application)
-    return application
+    return sv
