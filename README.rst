@@ -4,7 +4,6 @@ Querryl
 A web application for searching your Quassel database.
 
 
-
 Postgresql
 ----------
 It's recommended to setup a Postgresql user with read-only access to the Quassel database.
@@ -26,3 +25,7 @@ Installation
 Run
 ---
 ``twistd -n quassel``
+
+
+.. image:: https://travis-ci.org/ddormer/Querryl.svg?branch=master
+    :target: https://travis-ci.org/ddormer/Querryl
