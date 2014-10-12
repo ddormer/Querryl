@@ -6,8 +6,7 @@ from setuptools import setup
 
 def get_version():
     """
-    Get the version from version module without importing more than
-    necessary.
+    Get the version from version module without importing more than necessary.
     """
     version_module_path = os.path.join(
         os.path.dirname(__file__), "querryl", "_version.py")
