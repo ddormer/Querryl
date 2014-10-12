@@ -4,6 +4,7 @@ env:
   - TOX_ENV=py27-trunkdeps
 install:
   - pip install -e .
+  - pip install tox
   - pip install coveralls
 script:
   - tox -e $TOX_ENV
