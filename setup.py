@@ -45,7 +45,7 @@ setup(
     install_requires=["zope.interface>=3.6.0",
                       "twisted>=14.0.0",
                       "service_identity>=14.0.0",
-                      "psycopg2>=2.5.3",
+                      "psycopg2cffi>=2.6.1",
                       "txpostgres>=1.2",
                       "pyopenssl>=0.14"
                      ],
