@@ -1,0 +1,19 @@
+@import url(http://fonts.googleapis.com/css?family=PT+Sans:400,700);
+
+#top-bar {
+    background-color: black;
+    color: white;
+    font-family: 'PT Sans', sans-serif;
+}
+
+
+.highlight {
+    background-color: black;
+    color: white;
+}
+
+#menu > a {
+    text-decoration: none;
+    font-weight: 500;
+    color: #cb4b16;
+}
