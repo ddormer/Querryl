@@ -201,6 +201,7 @@ class Result extends Backbone.Model
 class Results extends Backbone.Collection
     model: Result
     url: '/search'
+    comparator: 'time'
 
     success: ->
         alertify.log('search complete')

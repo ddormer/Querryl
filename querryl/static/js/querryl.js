@@ -364,6 +364,8 @@
 
     Results.prototype.url = '/search';
 
+    Results.prototype.comparator = 'time';
+
     Results.prototype.success = function() {
       return alertify.log('search complete');
     };
