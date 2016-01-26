@@ -1,6 +1,5 @@
 language: python
 env:
-  - TOX_ENV=py26-trunkdeps
   - TOX_ENV=py27-trunkdeps
   - TOX_ENV=pypy
 install:
